@@ -1,0 +1,69 @@
+var _user$project$Tree$traverseWithPath = F3(
+	function (f, nodefn, tree) {
+		var go = F4(
+			function (f, t, idxs, idx) {
+				var _p0 = t;
+				var idxs$ = A2(_elm_lang$core$Array$push, idx, idxs);
+				return A2(
+					nodefn,
+					A2(f, _p0._0, idxs$),
+					A2(
+						_elm_lang$core$Array$indexedMap,
+						F2(
+							function (i, child) {
+								return A4(go, f, child, idxs$, i);
+							}),
+						_p0._1));
+			});
+		return A4(go, f, tree, _elm_lang$core$Array$empty, 0);
+	});
+var _user$project$Tree$getSubtreeAt = F2(
+	function (subtrees, index) {
+		var rightTrees = A3(
+			_elm_lang$core$Array$slice,
+			index + 1,
+			_elm_lang$core$Array$length(subtrees),
+			subtrees);
+		var leftTrees = A3(_elm_lang$core$Array$slice, 0, index, subtrees);
+		var otherTrees = A2(_elm_lang$core$Array$append, leftTrees, rightTrees);
+		var maybeTree = A2(_elm_lang$core$Array$get, index, subtrees);
+		return A2(
+			_elm_lang$core$Maybe$map,
+			function (tree) {
+				return {ctor: '_Tuple2', _0: tree, _1: otherTrees};
+			},
+			maybeTree);
+	});
+var _user$project$Tree$getValue = function (_p1) {
+	var _p2 = _p1;
+	return _p2._0;
+};
+var _user$project$Tree$Node = F2(
+	function (a, b) {
+		return {ctor: 'Node', _0: a, _1: b};
+	});
+var _user$project$Tree$leaf = function (value) {
+	return A2(_user$project$Tree$Node, value, _elm_lang$core$Array$empty);
+};
+var _user$project$Tree$node = F2(
+	function (v, children) {
+		return A2(
+			_user$project$Tree$Node,
+			v,
+			_elm_lang$core$Array$fromList(children));
+	});
+var _user$project$Tree$map = F2(
+	function (f, tree) {
+		var _p3 = tree;
+		return A2(
+			_user$project$Tree$Node,
+			f(_p3._0),
+			A2(
+				_elm_lang$core$Array$map,
+				_user$project$Tree$map(f),
+				_p3._1));
+	});
+var _user$project$Tree$mapWithPath = F2(
+	function (f, tree) {
+		return A3(_user$project$Tree$traverseWithPath, f, _user$project$Tree$Node, tree);
+	});

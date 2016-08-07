@@ -1,0 +1,236 @@
+var _user$project$DrawTree$update = F2(
+	function (msg, tree) {
+		var _p0 = msg;
+		return A2(
+			_elm_lang$core$Platform_Cmd_ops['!'],
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				tree,
+				A2(_user$project$MyTree$traverseDownwards, _p0._0, tree)),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	});
+var _user$project$DrawTree$arrayRest = function (arr) {
+	return A3(
+		_elm_lang$core$Array$slice,
+		1,
+		_elm_lang$core$Array$length(arr),
+		arr);
+};
+var _user$project$DrawTree$getLast = function (arr) {
+	return A2(
+		_elm_lang$core$Array$get,
+		_elm_lang$core$Array$length(arr) - 1,
+		arr);
+};
+var _user$project$DrawTree$daTree = A2(
+	_user$project$MyTree$node,
+	61,
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_user$project$MyTree$node,
+			84,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_user$project$MyTree$node,
+					22,
+					_elm_lang$core$Native_List.fromArray(
+						[])),
+					A2(
+					_user$project$MyTree$node,
+					38,
+					_elm_lang$core$Native_List.fromArray(
+						[]))
+				])),
+			A2(
+			_user$project$MyTree$node,
+			72,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_user$project$MyTree$node,
+					3,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_user$project$MyTree$node,
+							59,
+							_elm_lang$core$Native_List.fromArray(
+								[])),
+							A2(
+							_user$project$MyTree$node,
+							29,
+							_elm_lang$core$Native_List.fromArray(
+								[])),
+							A2(
+							_user$project$MyTree$node,
+							54,
+							_elm_lang$core$Native_List.fromArray(
+								[]))
+						])),
+					A2(
+					_user$project$MyTree$node,
+					25,
+					_elm_lang$core$Native_List.fromArray(
+						[])),
+					A2(
+					_user$project$MyTree$node,
+					49,
+					_elm_lang$core$Native_List.fromArray(
+						[]))
+				])),
+			A2(
+			_user$project$MyTree$node,
+			24,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_user$project$MyTree$node,
+					2,
+					_elm_lang$core$Native_List.fromArray(
+						[]))
+				])),
+			A2(
+			_user$project$MyTree$node,
+			17,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_user$project$MyTree$node,
+					26,
+					_elm_lang$core$Native_List.fromArray(
+						[])),
+					A2(
+					_user$project$MyTree$node,
+					68,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_user$project$MyTree$node,
+							13,
+							_elm_lang$core$Native_List.fromArray(
+								[])),
+							A2(
+							_user$project$MyTree$node,
+							36,
+							_elm_lang$core$Native_List.fromArray(
+								[]))
+						])),
+					A2(
+					_user$project$MyTree$node,
+					86,
+					_elm_lang$core$Native_List.fromArray(
+						[]))
+				]))
+		]));
+var _user$project$DrawTree$coolTree = A3(
+	_user$project$MyTree$traverseWithPath,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	F2(
+		function (v, trees) {
+			return A2(
+				_lorenzo$elm_tree_diagram$TreeDiagram$node,
+				v,
+				_elm_lang$core$Array$toList(trees));
+		}),
+	_user$project$DrawTree$daTree);
+var _user$project$DrawTree$init = _user$project$DrawTree$daTree;
+var _user$project$DrawTree_ops = _user$project$DrawTree_ops || {};
+_user$project$DrawTree_ops['=>'] = F2(
+	function (prop, value) {
+		return prop(
+			_elm_lang$core$Basics$toString(value));
+	});
+var _user$project$DrawTree$drawLine = F2(
+	function (_p2, _p1) {
+		var _p3 = _p2;
+		var _p4 = _p1;
+		return A2(
+			_elm_lang$svg$Svg$line,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(_user$project$DrawTree_ops['=>'], _elm_lang$svg$Svg_Attributes$x1, _p3._0),
+					A2(_user$project$DrawTree_ops['=>'], _elm_lang$svg$Svg_Attributes$y1, _p3._1),
+					A2(_user$project$DrawTree_ops['=>'], _elm_lang$svg$Svg_Attributes$x2, _p4._0),
+					A2(_user$project$DrawTree_ops['=>'], _elm_lang$svg$Svg_Attributes$y2, _p4._1),
+					_elm_lang$svg$Svg_Attributes$stroke('black')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	});
+var _user$project$DrawTree$GoDown = function (a) {
+	return {ctor: 'GoDown', _0: a};
+};
+var _user$project$DrawTree$drawNode = function (_p5) {
+	var _p6 = _p5;
+	return A2(
+		_elm_lang$svg$Svg$g,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$svg$Svg_Events$onClick(
+				_user$project$DrawTree$GoDown(
+					_user$project$DrawTree$arrayRest(_p6._1)))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$svg$Svg$circle,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$svg$Svg_Attributes$r('16'),
+						_elm_lang$svg$Svg_Attributes$stroke('black'),
+						_elm_lang$svg$Svg_Attributes$fill('white'),
+						_elm_lang$svg$Svg_Attributes$cx('0'),
+						_elm_lang$svg$Svg_Attributes$cy('0')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[])),
+				A2(
+				_elm_lang$svg$Svg$text$,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$svg$Svg_Attributes$textAnchor('middle'),
+						_elm_lang$svg$Svg_Attributes$alignmentBaseline('middle')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$svg$Svg$text(
+						_elm_lang$core$Basics$toString(_p6._0))
+					]))
+			]));
+};
+var _user$project$DrawTree$view = function (tree) {
+	var drawnTree = A3(
+		_user$project$MyTree$traverseWithPath,
+		F2(
+			function (v0, v1) {
+				return {ctor: '_Tuple2', _0: v0, _1: v1};
+			}),
+		F2(
+			function (v, trees) {
+				return A2(
+					_lorenzo$elm_tree_diagram$TreeDiagram$node,
+					v,
+					_elm_lang$core$Array$toList(trees));
+			}),
+		tree);
+	return A4(_lorenzo$elm_tree_diagram$TreeDiagram$drawSvg, _lorenzo$elm_tree_diagram$TreeDiagram$defaultTreeLayout, _user$project$DrawTree$drawNode, _user$project$DrawTree$drawLine, drawnTree);
+};
+var _user$project$DrawTree$main = {
+	main: _elm_lang$html$Html_App$program(
+		{
+			init: A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				_user$project$DrawTree$init,
+				_elm_lang$core$Native_List.fromArray(
+					[])),
+			update: _user$project$DrawTree$update,
+			view: _user$project$DrawTree$view,
+			subscriptions: _elm_lang$core$Basics$always(_elm_lang$core$Platform_Sub$none)
+		})
+};

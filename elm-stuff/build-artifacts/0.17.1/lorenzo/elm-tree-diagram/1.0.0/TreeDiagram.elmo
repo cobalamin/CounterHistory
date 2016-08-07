@@ -1,0 +1,515 @@
+var _lorenzo$elm_tree_diagram$TreeDiagram$ends = function (list) {
+	var last = _elm_lang$core$List$head(
+		_elm_lang$core$List$reverse(list));
+	var first = _elm_lang$core$List$head(list);
+	return A3(
+		_elm_lang$core$Maybe$map2,
+		F2(
+			function (a, b) {
+				return {ctor: '_Tuple2', _0: a, _1: b};
+			}),
+		first,
+		last);
+};
+var _lorenzo$elm_tree_diagram$TreeDiagram$buildContour = F3(
+	function (lContour, rContour, rContourOffset) {
+		var combinedContour = A3(
+			_elm_lang$core$List$map2,
+			F2(
+				function (_p1, _p0) {
+					var _p2 = _p1;
+					var _p3 = _p0;
+					return {ctor: '_Tuple2', _0: _p2._0, _1: _p3._1 + rContourOffset};
+				}),
+			lContour,
+			rContour);
+		var rLength = _elm_lang$core$List$length(rContour);
+		var lLength = _elm_lang$core$List$length(lContour);
+		return (_elm_lang$core$Native_Utils.cmp(lLength, rLength) > 0) ? A2(
+			_elm_lang$core$List$append,
+			combinedContour,
+			A2(_elm_lang$core$List$drop, rLength, lContour)) : A2(
+			_elm_lang$core$List$append,
+			combinedContour,
+			A2(
+				_elm_lang$core$List$map,
+				function (_p4) {
+					var _p5 = _p4;
+					return {ctor: '_Tuple2', _0: _p5._0 + rContourOffset, _1: _p5._1 + rContourOffset};
+				},
+				A2(_elm_lang$core$List$drop, lLength, rContour)));
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$pairwiseSubtreeOffset = F4(
+	function (siblingDistance, subtreeDistance, lContour, rContour) {
+		var levelDistances = A3(
+			_elm_lang$core$List$map2,
+			F2(
+				function (_p7, _p6) {
+					var _p8 = _p7;
+					var _p9 = _p6;
+					return _p8._1 - _p9._0;
+				}),
+			lContour,
+			rContour);
+		var _p10 = _elm_lang$core$List$maximum(levelDistances);
+		if (_p10.ctor === 'Just') {
+			var minDistance = (_elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$List$length(lContour),
+				1) || _elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$List$length(rContour),
+				1)) ? siblingDistance : subtreeDistance;
+			return _p10._0 + minDistance;
+		} else {
+			return 0;
+		}
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$subtreeOffsets = F3(
+	function (siblingDistance, subtreeDistance, contours) {
+		var _p11 = _elm_lang$core$List$head(contours);
+		if (_p11.ctor === 'Just') {
+			var cumulativeContours = A3(
+				_elm_lang$core$List$scanl,
+				F2(
+					function (c, _p12) {
+						var _p13 = _p12;
+						var _p14 = _p13._0;
+						var offset = A4(_lorenzo$elm_tree_diagram$TreeDiagram$pairwiseSubtreeOffset, siblingDistance, subtreeDistance, _p14, c);
+						return {
+							ctor: '_Tuple2',
+							_0: A3(_lorenzo$elm_tree_diagram$TreeDiagram$buildContour, _p14, c, offset),
+							_1: offset
+						};
+					}),
+				{ctor: '_Tuple2', _0: _p11._0, _1: 0},
+				A2(_elm_lang$core$List$drop, 1, contours));
+			return A2(
+				_elm_lang$core$List$map,
+				function (_p15) {
+					var _p16 = _p15;
+					return _p16._1;
+				},
+				cumulativeContours);
+		} else {
+			return _elm_lang$core$Native_List.fromArray(
+				[]);
+		}
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$rootOffset = F2(
+	function (lPrelimPosition, rPrelimPosition) {
+		return ((((lPrelimPosition.subtreeOffset + rPrelimPosition.subtreeOffset) + lPrelimPosition.rootOffset) + rPrelimPosition.rootOffset) / 2) | 0;
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$drawInternal = F3(
+	function (nodeDrawer, drawLine, _p17) {
+		var _p18 = _p17;
+		var _p22 = _p18._1;
+		var _p21 = _p18._0._1;
+		var rootDrawing = A2(nodeDrawer, _p18._0._0, _p21);
+		var subtreePositions = A2(
+			_elm_lang$core$List$map,
+			function (_p19) {
+				var _p20 = _p19;
+				return _p20._0._1;
+			},
+			_p22);
+		var edgeDrawings = A2(
+			_elm_lang$core$List$map,
+			drawLine(_p21),
+			subtreePositions);
+		return A2(
+			_elm_lang$core$List$append,
+			A2(
+				_elm_lang$core$List$append,
+				edgeDrawings,
+				_elm_lang$core$Native_List.fromArray(
+					[rootDrawing])),
+			A2(
+				_elm_lang$core$List$concatMap,
+				A2(_lorenzo$elm_tree_diagram$TreeDiagram$drawInternal, nodeDrawer, drawLine),
+				_p22));
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$drawInternalSvg = F5(
+	function (width, height, drawNode, drawLine, tree) {
+		var centerY = function (point) {
+			return (_elm_lang$core$Basics$toFloat(height) / 2) - point;
+		};
+		var centerX = function (point) {
+			return point + (_elm_lang$core$Basics$toFloat(width) / 2);
+		};
+		var nodeDrawer = F2(
+			function (value, _p23) {
+				var _p24 = _p23;
+				return A2(
+					_elm_lang$svg$Svg$g,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$svg$Svg_Attributes$transform(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'translate(',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(
+										centerX(_p24._0)),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' ',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(
+												centerY(_p24._1)),
+											')')))))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							drawNode(value)
+						]));
+			});
+		var lineDrawer = F2(
+			function (_p26, _p25) {
+				var _p27 = _p26;
+				var _p28 = _p25;
+				return A2(
+					drawLine,
+					{
+						ctor: '_Tuple2',
+						_0: centerX(_p27._0),
+						_1: centerY(_p27._1)
+					},
+					{
+						ctor: '_Tuple2',
+						_0: centerX(_p28._0),
+						_1: centerY(_p28._1)
+					});
+			});
+		return A3(_lorenzo$elm_tree_diagram$TreeDiagram$drawInternal, nodeDrawer, lineDrawer, tree);
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$drawInternalCollage = F3(
+	function (drawNode, drawLine, tree) {
+		return A3(
+			_lorenzo$elm_tree_diagram$TreeDiagram$drawInternal,
+			function (_p29) {
+				return A2(
+					_elm_lang$core$Basics$flip,
+					_evancz$elm_graphics$Collage$move,
+					drawNode(_p29));
+			},
+			drawLine,
+			tree);
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$treeExtrema = function (_p30) {
+	var _p31 = _p30;
+	var _p36 = _p31._0._1._1;
+	var _p35 = _p31._0._1._0;
+	var extrema = A2(_elm_lang$core$List$map, _lorenzo$elm_tree_diagram$TreeDiagram$treeExtrema, _p31._1);
+	var _p32 = _elm_lang$core$List$unzip(extrema);
+	var xExtrema = _p32._0;
+	var yExtrema = _p32._1;
+	var _p33 = _elm_lang$core$List$unzip(xExtrema);
+	var minXs = _p33._0;
+	var maxXs = _p33._1;
+	var minX = A2(
+		_elm_lang$core$Basics$min,
+		_p35,
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			_p35,
+			_elm_lang$core$List$minimum(minXs)));
+	var maxX = A2(
+		_elm_lang$core$Basics$max,
+		_p35,
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			_p35,
+			_elm_lang$core$List$maximum(maxXs)));
+	var _p34 = _elm_lang$core$List$unzip(yExtrema);
+	var minYs = _p34._0;
+	var maxYs = _p34._1;
+	var minY = A2(
+		_elm_lang$core$Basics$min,
+		_p36,
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			_p36,
+			_elm_lang$core$List$minimum(minYs)));
+	var maxY = A2(
+		_elm_lang$core$Basics$max,
+		_p36,
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			_p36,
+			_elm_lang$core$List$maximum(maxYs)));
+	return {
+		ctor: '_Tuple2',
+		_0: {ctor: '_Tuple2', _0: minX, _1: maxX},
+		_1: {ctor: '_Tuple2', _0: minY, _1: maxY}
+	};
+};
+var _lorenzo$elm_tree_diagram$TreeDiagram$treeBoundingBox = function (tree) {
+	var _p37 = _lorenzo$elm_tree_diagram$TreeDiagram$treeExtrema(tree);
+	var minX = _p37._0._0;
+	var maxX = _p37._0._1;
+	var minY = _p37._1._0;
+	var maxY = _p37._1._1;
+	return {ctor: '_Tuple2', _0: maxX - minX, _1: maxY - minY};
+};
+var _lorenzo$elm_tree_diagram$TreeDiagram$drawPositioned = F4(
+	function (padding, drawNode, drawLine, positionedTree) {
+		var _p38 = _lorenzo$elm_tree_diagram$TreeDiagram$treeBoundingBox(positionedTree);
+		var width = _p38._0;
+		var height = _p38._1;
+		var totalWidth = _elm_lang$core$Basics$round(width) + (2 * padding);
+		var totalHeight = _elm_lang$core$Basics$round(height) + (2 * padding);
+		var _p39 = {ctor: '_Tuple2', _0: drawNode, _1: drawLine};
+		_v15_2:
+		do {
+			if (_p39._0.ctor === 'CanvasNodeDrawer') {
+				if (_p39._1.ctor === 'CanvasEdgeDrawer') {
+					return _evancz$elm_graphics$Element$toHtml(
+						A3(
+							_evancz$elm_graphics$Collage$collage,
+							totalWidth,
+							totalHeight,
+							A3(_lorenzo$elm_tree_diagram$TreeDiagram$drawInternalCollage, _p39._0._0, _p39._1._0, positionedTree)));
+				} else {
+					break _v15_2;
+				}
+			} else {
+				if (_p39._1.ctor === 'SvgEdgeDrawer') {
+					return A2(
+						_elm_lang$svg$Svg$svg,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$svg$Svg_Attributes$width(
+								_elm_lang$core$Basics$toString(totalWidth)),
+								_elm_lang$svg$Svg_Attributes$height(
+								_elm_lang$core$Basics$toString(totalHeight))
+							]),
+						A5(_lorenzo$elm_tree_diagram$TreeDiagram$drawInternalSvg, totalWidth, totalHeight, _p39._0._0, _p39._1._0, positionedTree));
+				} else {
+					break _v15_2;
+				}
+			}
+		} while(false);
+		return _elm_lang$core$Native_Utils.crashCase(
+			'TreeDiagram',
+			{
+				start: {line: 227, column: 5},
+				end: {line: 253, column: 63}
+			},
+			_p39)('Either a canvas or a SVG can be rendered');
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$PrelimPosition = F2(
+	function (a, b) {
+		return {subtreeOffset: a, rootOffset: b};
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$TreeLayout = F5(
+	function (a, b, c, d, e) {
+		return {orientation: a, levelHeight: b, siblingDistance: c, subtreeDistance: d, padding: e};
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$Node = F2(
+	function (a, b) {
+		return {ctor: 'Node', _0: a, _1: b};
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$node = F2(
+	function (val, children) {
+		return A2(_lorenzo$elm_tree_diagram$TreeDiagram$Node, val, children);
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$final = F4(
+	function (level, levelHeight, lOffset, _p41) {
+		var _p42 = _p41;
+		var _p45 = _p42._1;
+		var subtreePrelimPositions = A2(
+			_elm_lang$core$List$map,
+			function (_p43) {
+				var _p44 = _p43;
+				return _p44._0._1;
+			},
+			_p45);
+		var visited = A3(
+			_elm_lang$core$List$map2,
+			F2(
+				function (prelimPos, subtree) {
+					return A4(_lorenzo$elm_tree_diagram$TreeDiagram$final, level + 1, levelHeight, lOffset + prelimPos.subtreeOffset, subtree);
+				}),
+			subtreePrelimPositions,
+			_p45);
+		var finalPosition = {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Basics$toFloat(lOffset + _p42._0._1.rootOffset),
+			_1: _elm_lang$core$Basics$toFloat(level * levelHeight)
+		};
+		return A2(
+			_lorenzo$elm_tree_diagram$TreeDiagram$Node,
+			{ctor: '_Tuple2', _0: _p42._0._0, _1: finalPosition},
+			visited);
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$prelim = F3(
+	function (siblingDistance, subtreeDistance, _p46) {
+		var _p47 = _p46;
+		var _p54 = _p47._0;
+		var visited = A2(
+			_elm_lang$core$List$map,
+			A2(_lorenzo$elm_tree_diagram$TreeDiagram$prelim, siblingDistance, subtreeDistance),
+			_p47._1);
+		var _p48 = _elm_lang$core$List$unzip(visited);
+		var subtrees = _p48._0;
+		var childContours = _p48._1;
+		var offsets = A3(_lorenzo$elm_tree_diagram$TreeDiagram$subtreeOffsets, siblingDistance, subtreeDistance, childContours);
+		var updatedChildren = A3(
+			_elm_lang$core$List$map2,
+			F2(
+				function (_p49, offset) {
+					var _p50 = _p49;
+					return A2(
+						_lorenzo$elm_tree_diagram$TreeDiagram$Node,
+						{
+							ctor: '_Tuple2',
+							_0: _p50._0._0,
+							_1: _elm_lang$core$Native_Utils.update(
+								_p50._0._1,
+								{subtreeOffset: offset})
+						},
+						_p50._1);
+				}),
+			subtrees,
+			offsets);
+		var _p51 = _lorenzo$elm_tree_diagram$TreeDiagram$ends(
+			A3(
+				_elm_lang$core$List$map2,
+				F2(
+					function (v0, v1) {
+						return {ctor: '_Tuple2', _0: v0, _1: v1};
+					}),
+				updatedChildren,
+				childContours));
+		if (_p51.ctor === 'Just') {
+			var _p52 = _p51._0._1._0;
+			var rPrelimPos = _p52._0._1;
+			var _p53 = _p51._0._0._0;
+			var lPrelimPos = _p53._0._1;
+			var prelimPos = {
+				subtreeOffset: 0,
+				rootOffset: A2(_lorenzo$elm_tree_diagram$TreeDiagram$rootOffset, lPrelimPos, rPrelimPos)
+			};
+			var rootContour = {ctor: '_Tuple2', _0: prelimPos.rootOffset, _1: prelimPos.rootOffset};
+			var treeContour = A2(
+				_elm_lang$core$List_ops['::'],
+				rootContour,
+				A3(_lorenzo$elm_tree_diagram$TreeDiagram$buildContour, _p51._0._0._1, _p51._0._1._1, rPrelimPos.subtreeOffset));
+			return {
+				ctor: '_Tuple2',
+				_0: A2(
+					_lorenzo$elm_tree_diagram$TreeDiagram$Node,
+					{ctor: '_Tuple2', _0: _p54, _1: prelimPos},
+					updatedChildren),
+				_1: treeContour
+			};
+		} else {
+			return {
+				ctor: '_Tuple2',
+				_0: A2(
+					_lorenzo$elm_tree_diagram$TreeDiagram$Node,
+					{
+						ctor: '_Tuple2',
+						_0: _p54,
+						_1: {subtreeOffset: 0, rootOffset: 0}
+					},
+					updatedChildren),
+				_1: _elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: 0, _1: 0}
+					])
+			};
+		}
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$treeMap = F2(
+	function (fn, _p55) {
+		var _p56 = _p55;
+		return A2(
+			_lorenzo$elm_tree_diagram$TreeDiagram$Node,
+			fn(_p56._0),
+			A2(
+				_elm_lang$core$List$map,
+				_lorenzo$elm_tree_diagram$TreeDiagram$treeMap(fn),
+				_p56._1));
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$position = F5(
+	function (siblingDistance, subtreeDistance, levelHeight, layout, tree) {
+		var _p57 = A3(_lorenzo$elm_tree_diagram$TreeDiagram$prelim, siblingDistance, subtreeDistance, tree);
+		var prelimTree = _p57._0;
+		var finalTree = A4(_lorenzo$elm_tree_diagram$TreeDiagram$final, 0, levelHeight, 0, prelimTree);
+		var _p58 = _lorenzo$elm_tree_diagram$TreeDiagram$treeBoundingBox(finalTree);
+		var width = _p58._0;
+		var height = _p58._1;
+		var transform = function (_p59) {
+			var _p60 = _p59;
+			var _p63 = _p60._1;
+			var _p62 = _p60._0;
+			var _p61 = layout;
+			switch (_p61.ctor) {
+				case 'LeftToRight':
+					return {ctor: '_Tuple2', _0: _p63 - (height / 2), _1: _p62 - (width / 2)};
+				case 'RightToLeft':
+					return {ctor: '_Tuple2', _0: (0 - _p63) + (height / 2), _1: _p62 - (width / 2)};
+				case 'BottomToTop':
+					return {ctor: '_Tuple2', _0: _p62 - (width / 2), _1: _p63 - (height / 2)};
+				default:
+					return {ctor: '_Tuple2', _0: _p62 - (width / 2), _1: (0 - _p63) + (height / 2)};
+			}
+		};
+		return A2(
+			_lorenzo$elm_tree_diagram$TreeDiagram$treeMap,
+			function (_p64) {
+				var _p65 = _p64;
+				return {
+					ctor: '_Tuple2',
+					_0: _p65._0,
+					_1: transform(_p65._1)
+				};
+			},
+			finalTree);
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$draw = F4(
+	function (layout, drawNode, drawLine, tree) {
+		var positionedTree = A5(_lorenzo$elm_tree_diagram$TreeDiagram$position, layout.siblingDistance, layout.subtreeDistance, layout.levelHeight, layout.orientation, tree);
+		return A4(_lorenzo$elm_tree_diagram$TreeDiagram$drawPositioned, layout.padding, drawNode, drawLine, positionedTree);
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$BottomToTop = {ctor: 'BottomToTop'};
+var _lorenzo$elm_tree_diagram$TreeDiagram$bottomToTop = _lorenzo$elm_tree_diagram$TreeDiagram$BottomToTop;
+var _lorenzo$elm_tree_diagram$TreeDiagram$TopToBottom = {ctor: 'TopToBottom'};
+var _lorenzo$elm_tree_diagram$TreeDiagram$defaultTreeLayout = {orientation: _lorenzo$elm_tree_diagram$TreeDiagram$TopToBottom, levelHeight: 100, siblingDistance: 50, subtreeDistance: 80, padding: 40};
+var _lorenzo$elm_tree_diagram$TreeDiagram$topToBottom = _lorenzo$elm_tree_diagram$TreeDiagram$TopToBottom;
+var _lorenzo$elm_tree_diagram$TreeDiagram$RightToLeft = {ctor: 'RightToLeft'};
+var _lorenzo$elm_tree_diagram$TreeDiagram$rightToLeft = _lorenzo$elm_tree_diagram$TreeDiagram$RightToLeft;
+var _lorenzo$elm_tree_diagram$TreeDiagram$LeftToRight = {ctor: 'LeftToRight'};
+var _lorenzo$elm_tree_diagram$TreeDiagram$leftToRight = _lorenzo$elm_tree_diagram$TreeDiagram$LeftToRight;
+var _lorenzo$elm_tree_diagram$TreeDiagram$SvgNodeDrawer = function (a) {
+	return {ctor: 'SvgNodeDrawer', _0: a};
+};
+var _lorenzo$elm_tree_diagram$TreeDiagram$CanvasNodeDrawer = function (a) {
+	return {ctor: 'CanvasNodeDrawer', _0: a};
+};
+var _lorenzo$elm_tree_diagram$TreeDiagram$SvgEdgeDrawer = function (a) {
+	return {ctor: 'SvgEdgeDrawer', _0: a};
+};
+var _lorenzo$elm_tree_diagram$TreeDiagram$drawSvg = F4(
+	function (layout, drawNode, drawLine, tree) {
+		return A4(
+			_lorenzo$elm_tree_diagram$TreeDiagram$draw,
+			layout,
+			_lorenzo$elm_tree_diagram$TreeDiagram$SvgNodeDrawer(drawNode),
+			_lorenzo$elm_tree_diagram$TreeDiagram$SvgEdgeDrawer(drawLine),
+			tree);
+	});
+var _lorenzo$elm_tree_diagram$TreeDiagram$CanvasEdgeDrawer = function (a) {
+	return {ctor: 'CanvasEdgeDrawer', _0: a};
+};
+var _lorenzo$elm_tree_diagram$TreeDiagram$drawCollage = F4(
+	function (layout, drawNode, drawLine, tree) {
+		return A4(
+			_lorenzo$elm_tree_diagram$TreeDiagram$draw,
+			layout,
+			_lorenzo$elm_tree_diagram$TreeDiagram$CanvasNodeDrawer(drawNode),
+			_lorenzo$elm_tree_diagram$TreeDiagram$CanvasEdgeDrawer(drawLine),
+			tree);
+	});

@@ -1,0 +1,29 @@
+var _cobalamin$history_tree$Tree$getSubtreeAt = F2(
+	function (subtrees, index) {
+		var rightTrees = A3(
+			_elm_lang$core$Array$slice,
+			index + 1,
+			_elm_lang$core$Array$length(subtrees),
+			subtrees);
+		var leftTrees = A3(_elm_lang$core$Array$slice, 0, index, subtrees);
+		var otherTrees = A2(_elm_lang$core$Array$append, leftTrees, rightTrees);
+		var maybeTree = A2(_elm_lang$core$Array$get, index, subtrees);
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			maybeTree,
+			function (tree) {
+				return _elm_lang$core$Maybe$Just(
+					{ctor: '_Tuple2', _0: tree, _1: otherTrees});
+			});
+	});
+var _cobalamin$history_tree$Tree$getValue = function (_p0) {
+	var _p1 = _p0;
+	return _p1._0;
+};
+var _cobalamin$history_tree$Tree$Node = F2(
+	function (a, b) {
+		return {ctor: 'Node', _0: a, _1: b};
+	});
+var _cobalamin$history_tree$Tree$leaf = function (value) {
+	return A2(_cobalamin$history_tree$Tree$Node, value, _elm_lang$core$Array$empty);
+};

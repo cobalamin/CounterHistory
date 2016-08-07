@@ -1,0 +1,165 @@
+var _cobalamin$history_tree$FocusTree$joinArraysWith = F3(
+	function (l, r, value) {
+		return A3(
+			_elm_lang$core$Basics$flip,
+			_elm_lang$core$Array$append,
+			r,
+			A2(
+				_elm_lang$core$Array$append,
+				l,
+				_elm_lang$core$Array$fromList(
+					_elm_lang$core$Native_List.fromArray(
+						[value]))));
+	});
+var _cobalamin$history_tree$FocusTree$insertIntoArray = F3(
+	function (index, value, array) {
+		return A3(
+			_cobalamin$history_tree$FocusTree$joinArraysWith,
+			A3(_elm_lang$core$Array$slice, 0, index, array),
+			A3(
+				_elm_lang$core$Array$slice,
+				index,
+				_elm_lang$core$Array$length(array),
+				array),
+			value);
+	});
+var _cobalamin$history_tree$FocusTree$canGoUp = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Basics$not(
+		_elm_lang$core$List$isEmpty(_p1._1));
+};
+var _cobalamin$history_tree$FocusTree$canGoDown = function (_p2) {
+	var _p3 = _p2;
+	return _elm_lang$core$Basics$not(
+		_elm_lang$core$Array$isEmpty(_p3._0._1));
+};
+var _cobalamin$history_tree$FocusTree$branchCount = function (_p4) {
+	var _p5 = _p4;
+	return _elm_lang$core$Array$length(_p5._0._1);
+};
+var _cobalamin$history_tree$FocusTree$getCurrentValue = function (_p6) {
+	var _p7 = _p6;
+	return _cobalamin$history_tree$Tree$getValue(_p7._0);
+};
+var _cobalamin$history_tree$FocusTree$Crumb = F3(
+	function (a, b, c) {
+		return {ctor: 'Crumb', _0: a, _1: b, _2: c};
+	});
+var _cobalamin$history_tree$FocusTree$FocusTree = F2(
+	function (a, b) {
+		return {ctor: 'FocusTree', _0: a, _1: b};
+	});
+var _cobalamin$history_tree$FocusTree$init = function (value) {
+	return A2(
+		_cobalamin$history_tree$FocusTree$FocusTree,
+		_cobalamin$history_tree$Tree$leaf(value),
+		_elm_lang$core$Native_List.fromArray(
+			[]));
+};
+var _cobalamin$history_tree$FocusTree$insertChild = F2(
+	function (childValue, _p8) {
+		var _p9 = _p8;
+		var childTree = _cobalamin$history_tree$Tree$leaf(childValue);
+		var _p10 = _p9._0;
+		var _p11 = _p10._1;
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Array$length(_p11),
+			_1: A2(
+				_cobalamin$history_tree$FocusTree$FocusTree,
+				A2(
+					_cobalamin$history_tree$Tree$Node,
+					_p10._0,
+					A2(_elm_lang$core$Array$push, childTree, _p11)),
+				_p9._1)
+		};
+	});
+var _cobalamin$history_tree$FocusTree$goDown = F2(
+	function (index, _p12) {
+		var _p13 = _p12;
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_cobalamin$history_tree$Tree$getSubtreeAt, _p13._0._1, index),
+			function (_p14) {
+				var _p15 = _p14;
+				return _elm_lang$core$Maybe$Just(
+					A2(
+						_cobalamin$history_tree$FocusTree$FocusTree,
+						_p15._0,
+						A2(
+							_elm_lang$core$List_ops['::'],
+							A3(_cobalamin$history_tree$FocusTree$Crumb, index, _p13._0._0, _p15._1),
+							_p13._1)));
+			});
+	});
+var _cobalamin$history_tree$FocusTree$insertAndFocus = F2(
+	function (value, tree) {
+		var forceGoDown = F2(
+			function (index, tree) {
+				var _p16 = A2(_cobalamin$history_tree$FocusTree$goDown, index, tree);
+				if (_p16.ctor === 'Nothing') {
+					return _elm_lang$core$Native_Utils.crashCase(
+						'FocusTree',
+						{
+							start: {line: 69, column: 13},
+							end: {line: 76, column: 33}
+						},
+						_p16)('\n                                Huh. We tried to insert and refocus on a new child but couldn\'t step downwards.\n                                This shouldn\'t occur. Please report a bug.\n                                ');
+				} else {
+					return _p16._0;
+				}
+			});
+		var _p18 = A2(_cobalamin$history_tree$FocusTree$insertChild, value, tree);
+		var index = _p18._0;
+		var newFocusTree = _p18._1;
+		return A2(forceGoDown, index, newFocusTree);
+	});
+var _cobalamin$history_tree$FocusTree$traverseDownwards = F2(
+	function (indices, focusTree) {
+		var go = F2(
+			function (index, maybeTree) {
+				return A2(
+					_elm_lang$core$Maybe$andThen,
+					maybeTree,
+					function (tree) {
+						return A2(_cobalamin$history_tree$FocusTree$goDown, index, tree);
+					});
+			});
+		return A3(
+			_elm_lang$core$List$foldl,
+			go,
+			_elm_lang$core$Maybe$Just(focusTree),
+			indices);
+	});
+var _cobalamin$history_tree$FocusTree$goUp = function (_p19) {
+	var _p20 = _p19;
+	var _p21 = _p20._1;
+	if (_p21.ctor === '[]') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		var familyReunion = A3(_cobalamin$history_tree$FocusTree$insertIntoArray, _p21._0._0, _p20._0, _p21._0._2);
+		return _elm_lang$core$Maybe$Just(
+			A2(
+				_cobalamin$history_tree$FocusTree$FocusTree,
+				A2(_cobalamin$history_tree$Tree$Node, _p21._0._1, familyReunion),
+				_p21._1));
+	}
+};
+var _cobalamin$history_tree$FocusTree$goToTop = function (_p22) {
+	goToTop:
+	while (true) {
+		var _p23 = _p22;
+		var _p24 = _cobalamin$history_tree$FocusTree$goUp(_p23);
+		if (_p24.ctor === 'Nothing') {
+			return A2(
+				_cobalamin$history_tree$FocusTree$FocusTree,
+				_p23._0,
+				_elm_lang$core$Native_List.fromArray(
+					[]));
+		} else {
+			var _v13 = _p24._0;
+			_p22 = _v13;
+			continue goToTop;
+		}
+	}
+};

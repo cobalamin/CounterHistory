@@ -1,0 +1,18 @@
+var _cobalamin$history_tree$HistoryTree$rewind = _cobalamin$history_tree$FocusTree$goToTop;
+var _cobalamin$history_tree$HistoryTree$goto = _cobalamin$history_tree$FocusTree$traverseDownwards;
+var _cobalamin$history_tree$HistoryTree$canRedo = _cobalamin$history_tree$FocusTree$canGoDown;
+var _cobalamin$history_tree$HistoryTree$canUndo = _cobalamin$history_tree$FocusTree$canGoUp;
+var _cobalamin$history_tree$HistoryTree$push = _cobalamin$history_tree$FocusTree$insertAndFocus;
+var _cobalamin$history_tree$HistoryTree$branchCount = _cobalamin$history_tree$FocusTree$branchCount;
+var _cobalamin$history_tree$HistoryTree$redo = _cobalamin$history_tree$FocusTree$goDown;
+var _cobalamin$history_tree$HistoryTree$undo = _cobalamin$history_tree$FocusTree$goUp;
+var _cobalamin$history_tree$HistoryTree$current = _cobalamin$history_tree$FocusTree$getCurrentValue;
+var _cobalamin$history_tree$HistoryTree$apply = F2(
+	function (f, tree) {
+		return A2(
+			_cobalamin$history_tree$HistoryTree$push,
+			f(
+				_cobalamin$history_tree$HistoryTree$current(tree)),
+			tree);
+	});
+var _cobalamin$history_tree$HistoryTree$init = _cobalamin$history_tree$FocusTree$init;
